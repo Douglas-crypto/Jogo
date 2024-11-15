@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo de Labirinto</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        #main {
+            text-align: center;
+        }
+
+        #final-message {
+            display: none;
+        }
+
+        .game-container {
+            position: relative;
+            width: 600px;
+            height: 600px;
+            margin-bottom: 100px;
+        }
+
+        .maze {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background-color: #fff;
+            border: 2px solid #000;
+        }
+
+        .player {
+            position: relative;
+            width: 20px;
+            height: 20px;
+            background-color: blue;
+        }
+
+        .coin {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: gold;
+            background-image: url('https://png.pngtree.com/png-clipart/20190603/original/pngtree-cartoon-coin-png-image_161124.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .enemy {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: red;
+            background-image: url('https://w7.pngwing.com/pngs/9/115/png-transparent-bomb-cartoon-cherry-enemy-evil-explosive-eyes-fuse-game-purple.png');
+            background-size: cover;
+            background-position: center;
+        }
+
+
+        .floating-card {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            width: 250px;
+        }
+
+        .floating-card p {
+            font-size: 16px;
+            margin: 0;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .progress-container {
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            margin-top: 10px;
+            height: 20px;
+            width: 100%;
+        }
+
+        .progress-bar {
+            background-color: #76c7c0;
+            height: 100%;
+            border-radius: 5px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .wall {
+            position: absolute;
+            background-color: black;
+        }
+
+        .success {
+            background-color: green;
+        }
+
+        .error {
+            background-color: red;
+        }
+
+        .btn {
+            background-color: green;
+            padding: 10px 12px;
+            border: 0;
+            color: white;
+            border-radius: 15px;
+            margin: 30px 0;
+            transition: all ease-in-out 0.3s;
+        }
+
+        .btn:hover {
+            transform: scale(1.2);
+        }
+
+        #last-msg {
+            font-size: 20px;
+            font-weight: 700;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="main">
+
+        <div class="floating-card">
+            <p id="msg">Pegue todas as moedas e libere o caminho</p>
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+        </div>
+
+
+        <div class="game-container">
+            <div class="maze">
+                <div class="player" id="player"></div>
+                <!-- Paredes do labirinto -->
+
+                <div class="wall" style="top: 0; left: 100px; width: 60px; height: 20px;"></div>
+                <div class="wall" style="top: 20px; left: 140px; width: 20px; height: 60px;"></div>
+                <div class="wall" style="top: 0px; left: 240px; width: 20px; height: 180px;"></div>
+                <div class="wall" style="top: 80px; right: 0px; width: 100px; height: 20px;"></div>
+                <div class="wall" style="top: 40px; right: 120px; width: 20px; height: 160px;"></div>
+                <div class="wall" style="top: 240px; right: 0px; width: 160px; height: 20px;"></div>
+                <div class="wall" style="bottom: 100px; right: 200px; width: 20px; height: 100px;"></div>
+                <div class="wall" style="bottom: 0px; right: 60px; width: 20px; height: 80px;"></div>
+                <div class="wall" style="bottom: 140px; right: 20px; width: 20px; height: 100px;"></div>
+                <div class="wall" style="bottom: 340px; right: 40px; width: 20px; height: 100px;"></div>
+                <div class="wall" style="bottom: 0px; right: 360px; width: 20px; height: 80px;"></div>
+                <div class="wall" style="bottom: 40px; right: 280px; width: 20px; height: 100px;"></div>
+                <div class="wall" style="bottom: 40px; right: 260px; width: 60px; height: 20px;"></div>
+                <div class="wall" style="bottom: 40px; right: 460px; width: 60px; height: 20px;"></div>
+                <div class="wall" style="bottom: 80px; right: 360px; width: 60px; height: 20px;"></div>
+                <div class="wall" style="bottom: 80px; right: 120px; width: 100px; height: 20px;"></div>
+                <div class="wall" style="top: 0px; left: 80px; width: 20px; height: 80px;"></div>
+                <div class="wall" style="top: 60px; left: 160px; width: 40px; height: 20px;"></div>
+                <div class="wall" style="top: 80px; left: 0; width: 20px; height: 60px;"></div>
+                <div class="wall" style="top: 120px; left: 20px; width: 120px; height: 20px;"></div>
+                <div class="wall" style="top: 200px; left: 0; width: 80px; height: 20px;"></div>
+                <div class="wall" style="top: 200px; left: 100px; width: 20px; height: 60px;"></div>
+                <div class="wall" style="top: 200px; left: 180px; width: 20px; height: 60px;"></div>
+                <div class="wall" style="top: 260px; left: 20px; width: 100px; height: 20px;"></div>
+                <div class="wall" style="top: 260px; left: 180px; width: 100px; height: 20px;"></div>
+                <div class="wall" style="top: 160px; left: 260px; width: 60px; height: 20px;"></div>
+                <div class="wall" style="top: 160px; left: 300px; width: 20px; height: 80px;"></div>
+                <div class="wall" style="top: 340px; left: 0; width: 80px; height: 20px;"></div>
+                <div class="wall" style="top: 400px; left: 80px; width: 20px; height: 140px;"></div>
+                <div class="wall" style="top: 340px; left: 520px; width: 80px; height: 20px;"></div>
+                <div class="wall" style="top: 440px; left: 400px; width: 120px; height: 20px;"></div>
+                <div class="wall" style="top: 340px; left: 520px; width: 20px; height: 120px;"></div>
+                <div class="wall" style="top: 340px; left: 460px; width: 80px; height: 20px;"></div>
+                <div class="wall" style="top: 300px; left: 280px; width: 20px; height: 80px;"></div>
+                <div class="wall" style="top: 340px; left: 120; width: 80px; height: 20px;"></div>
+                <div class="wall" style="top: 300px; left: 200px; width: 20px; height: 120px;"></div>
+                <div class="wall" style="top: 300px; left: 80px; width: 200px; height: 20px;"></div>
+                <div class="wall" style="top: 440px; left: 40px; width: 340px; height: 20px;"></div>
+                <div class="wall" style="top: 20px; right: 0px; width: 280px; height: 20px;"></div>
+                <div class="wall" style="top: 600px; left: -20px; width: 640px; height: 20px;"></div>
+                <div class="wall" style="top: -21px; left: -20px; width: 640px; height: 20px;"></div>
+                <div class="wall" style="bottom: 0px; left: -20px; width: 20px; height: 620px;"></div>
+                <div class="wall" style="top: -20px; left: 600px; width: 20px; height: 520px;"></div>
+                <div class="wall" style="top: 40px; left: 380px; width: 20px; height: 300px;"></div>
+
+                <div class="wall error" id="way" style="bottom: 0px; left: 600px; width: 20px; height: 100px;"></div>
+
+                <!-- moedas -->
+                <div class="coin" style="top: 80px; left: 50px;"></div>
+                <div class="coin" style="top: 150px; left: 200px;"></div>
+                <div class="coin" style="top: 150px; left: 20px;"></div>
+                <div class="coin" style="top: 260px; left: 130px;"></div>
+                <div class="coin" style="top: 340px; left: 130px;"></div>
+                <div class="coin" style="top: 500px; left: 130px;"></div>
+                <div class="coin" style="top: 540px; left: 130px;"></div>
+                <div class="coin" style="top: 540px; left: 400px;"></div>
+                <div class="coin" style="top: 500px; left: 30px;"></div>
+                <div class="coin" style="top: 40px; left: 340px;"></div>
+                <div class="coin" style="top: 0px; left: 560px;"></div>
+                <div class="coin" style="top: 50px; left: 560px;"></div>
+                <div class="coin" style="top: 120px; left: 500px;"></div>
+                <div class="coin" style="top: 220px; left: 500px;"></div>
+                <div class="coin" style="top: 280px; left: 550px;"></div>
+                <div class="coin" style="top: 400px; left: 420px;"></div>
+                <div class="coin" style="top: 400px; left: 320px;"></div>
+                <div class="coin" style="top: 260px; left: 320px;"></div>
+                <div class="coin" style="top: 60px; left: 420px;"></div>
+
+
+                <!-- inimigos -->
+                <div class="enemy" style="top: 180px; left: 100px;"></div>
+                <div class="enemy" style="top: 340px; left: 140px;"></div>
+                <div class="enemy" style="top: 480px; left: 150px;"></div>
+                <div class="enemy" style="top: 520px; left: 400px;"></div>
+                <div class="enemy" style="top: 300px; left: 300px;"></div>
+                <div class="enemy" style="top: 120px; left: 300px;"></div>
+                <div class="enemy" style="top: 300px; left: 430px;"></div>
+
+            </div>
+        </div>
+    </div>
+
+    <div id="final-message" style="flex-direction: column; align-items: center;">
+        <p id="last-msg"></p>
+        <img width="150px" src="" alt="">
+        <button class="btn" id="restart-button">Jogar novamente</button>
+    </div>
+
+    <script src="./dist/bundle.js"></script>
+
+</body>
+
+</html>
